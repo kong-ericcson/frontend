@@ -11,24 +11,26 @@ spec:
     metadata:
       labels:
         app: api
+      annotations:
+        bluetext.io/gateway: kong
     spec:
       tolerations:
-        - key: node-role.kubernetes.io/control-plane
-          operator: Exists
-          effect: NoSchedule
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
       containers:
-        - name: api
-          image: bluetext-api:latest
-          imagePullPolicy: Never
-          ports:
-            - containerPort: 3030
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 3030
-            initialDelaySeconds: 2
-            periodSeconds: 5
-            failureThreshold: 6
-          env:
-            - name: PORT
-              value: "3030"
+      - name: api
+        image: bluetext-api:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 3030
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3030
+          initialDelaySeconds: 2
+          periodSeconds: 5
+          failureThreshold: 6
+        env:
+        - name: PORT
+          value: '3030'

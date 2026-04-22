@@ -9,7 +9,9 @@ spec:
         - name: app
           env:
             - name: API_URL
-              value: "http://api.{{NS:main}}.svc.cluster.local"
+              value: "http://kong"
+            - name: API_HOST
+              value: "kong.{{NAMESPACE}}.bluetext.localhost"
           volumeMounts:
             - name: project
               mountPath: /app

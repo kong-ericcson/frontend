@@ -1,14 +1,21 @@
-_format_version: "3.0"
+_format_version: '3.0'
 services:
+- name: catch-all
+  url: http://localhost
+  routes:
   - name: catch-all
-    url: http://localhost
-    routes:
-      - name: catch-all
-        paths:
-          - /
-    plugins:
-      - name: request-termination
-        config:
-          status_code: 404
-          content_type: application/json
-          body: '{"message":"No routes configured","hint":"b bp run gateway/kong-proxy --var targets=<service-id>"}'
+    paths:
+    - /
+  plugins:
+  - name: request-termination
+    config:
+      status_code: 404
+      content_type: application/json
+      body: '{"message":"No routes configured","hint":"b bp run gateway/kong-proxy --var targets=<service-id>"}'
+- name: api
+  url: http://api
+  routes:
+  - name: api-route
+    paths:
+    - /api
+    strip_path: true

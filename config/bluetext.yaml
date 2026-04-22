@@ -14,3 +14,14 @@ run-specs:
         - web-app
         - api
         - kong
+relationships:
+- from: kong
+  to: api
+  type: gateway
+  label: Routes traffic to
+  blueprint: gateway/kong-proxy
+- from: web-app
+  to: kong
+  type: gateway
+  label: Routes API calls through
+  blueprint: gateway/kong-proxy
