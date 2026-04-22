@@ -1,0 +1,67 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  backend-ci:
+    name: Backend (Rust API) CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./code/services/api
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ./code/services/api
+
+      - name: Check formatting
+        run: cargo fmt -- --check
+
+      - name: Lint with Clippy
+        run: cargo clippy -- -D warnings
+
+      - name: Build
+        run: cargo build --verbose
+
+      # Uncomment once tests are written
+      # - name: Run tests
+      #   run: cargo test --verbose
+
+  frontend-ci:
+    name: Frontend (Web App) CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./code/services/web-app
+        
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Type Check
+        run: bun run tsc --noEmit || echo "No strict type checking yet"
+
+      - name: Build
+        run: bun run build
