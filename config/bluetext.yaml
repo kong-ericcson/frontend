@@ -25,3 +25,8 @@ relationships:
   type: gateway
   label: Routes API calls through
   blueprint: gateway/kong-proxy
+- from: kong
+  to: api
+  type: gateway
+  label: Exposes as MCP tools
+  blueprint: gateway/kong-mcp-proxy

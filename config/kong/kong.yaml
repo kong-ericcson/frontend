@@ -1,21 +1,58 @@
-_format_version: '3.0'
+_format_version: "3.0"
+
+# Upstream API service. Routes listed here are reachable directly through Kong
+# (e.g. GET /hello) *and* are what the ai-mcp-proxy plugin internally calls when
+# an MCP client invokes a tool — the plugin re-enters Kong via the mcp-gateway
+# service's localhost:8000 upstream, so every tool path must be a real route.
 services:
-- name: catch-all
-  url: http://localhost
-  routes:
+  - name: "api"
+    url: "http://api"
+    routes:
+      - name: "api-hello"
+        paths:
+          - /hello
+        strip_path: false
+      - name: "api-health"
+        paths:
+          - /health
+        strip_path: false
+
+  # MCP listener. Clients connect here (POST /mcp). The plugin translates
+  # MCP tool calls into internal HTTP calls against the routes above.
+  - name: mcp-gateway
+    url: http://localhost:8000
+    routes:
+      - name: mcp-conversion
+        paths:
+          - /mcp
+        strip_path: false
+        plugins:
+          - name: ai-mcp-proxy
+            config:
+              mode: conversion-listener
+              logging:
+                log_payloads: false
+                log_statistics: false
+              tools:
+                # Each entry becomes one MCP tool. `title` (lower-cased) becomes
+                # the tool name. `method` + `path` determines the upstream HTTP
+                # call — path must match a Kong route on the target service above.
+                - description: "Returns a simple greeting from the api (hello world)"
+                  method: GET
+                  path: /hello
+                  annotations:
+                    title: hello
+                    read_only_hint: true
+
   - name: catch-all
-    paths:
-    - /
-  plugins:
-  - name: request-termination
-    config:
-      status_code: 404
-      content_type: application/json
-      body: '{"message":"No routes configured","hint":"b bp run gateway/kong-proxy --var targets=<service-id>"}'
-- name: api
-  url: http://api
-  routes:
-  - name: api-route
-    paths:
-    - /api
-    strip_path: true
+    url: http://localhost
+    routes:
+      - name: catch-all
+        paths:
+          - /
+    plugins:
+      - name: request-termination
+        config:
+          status_code: 404
+          content_type: application/json
+          body: '{"message":"No routes configured","hint":"Add a route to the api service or edit config/kong/kong.yaml"}'
