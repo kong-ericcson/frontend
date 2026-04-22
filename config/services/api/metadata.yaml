@@ -1,0 +1,14 @@
+name: Rust API
+description: Backend API with Axum
+environments:
+  development:
+    mode: mirrord
+    command: cargo watch -x run
+start_prerequisites:
+  - description: cargo-watch installed for auto-rebuild on file changes
+    check: command_on_path
+    params:
+      name: cargo-watch
+    hint: |
+      Install cargo-watch so `cargo watch -x run` recompiles on save:
+        cargo install cargo-watch

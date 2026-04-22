@@ -1,0 +1,7 @@
+id: web-app
+name: Web App
+description: Frontend with Bun and Vite, hot reload via hostPath
+ports:
+- 5173
+dev_mode: in-cluster
+dependencies: []

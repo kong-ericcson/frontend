@@ -1,0 +1,18 @@
+[package]
+name = "models"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "models"
+path = "src/lib.rs"
+
+[[bin]]
+name = "models"
+path = "src/main.rs"
+
+[dependencies]
+bluetext-model = { path = "../code/bluetext-model" }
+tokio = { version = "1", features = ["rt", "macros"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

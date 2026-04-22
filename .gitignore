@@ -1,0 +1,4 @@
+.bluetext/
+.flutter-cache/
+node_modules/
+target/

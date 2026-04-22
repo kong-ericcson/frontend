@@ -1,0 +1,10 @@
+{
+  "feature": {
+    "fs": {
+      "mode": "local"
+    },
+    "network": {
+      "incoming": "steal"
+    }
+  }
+}

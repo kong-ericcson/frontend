@@ -1,0 +1,16 @@
+environments:
+  development:
+    description: Development environment
+  test:
+    description: Test environment
+  production:
+    description: Production environment
+run-specs:
+  default:
+    autorun: development
+    namespaces:
+      main:
+        services:
+        - web-app
+        - api
+        - kong

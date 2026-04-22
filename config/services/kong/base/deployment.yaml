@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kong
+  labels:
+    app: kong
+  annotations:
+    bluetext.io/reload-command: kong reload
+    bluetext.io/reload-watch: config/kong
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kong
+  template:
+    metadata:
+      labels:
+        app: kong
+    spec:
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      containers:
+        - name: kong
+          image: bluetext-kong:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+              name: proxy
+            - containerPort: 8001
+              name: admin
+          env:
+            - name: KONG_PLUGINS
+              value: "bundled,phantom-token"
+            - name: KONG_NGINX_HTTP_LUA_SHARED_DICT
+              value: "phantom-token 10m"
+            - name: KONG_DATABASE
+              value: "off"
+            - name: KONG_DECLARATIVE_CONFIG
+              value: /config/kong/kong.yaml
+            - name: KONG_PROXY_LISTEN
+              value: "0.0.0.0:8000"
+            - name: KONG_ADMIN_LISTEN
+              value: "0.0.0.0:8001"
+            - name: KONG_UNTRUSTED_LUA_SANDBOX_REQUIRES
+              value: "cjson"
+          readinessProbe:
+            httpGet:
+              path: /status
+              port: 8001
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 12
+          volumeMounts:
+            - name: project
+              mountPath: /app
+            - name: kong-config
+              mountPath: /config/kong
+      volumes:
+        - name: project
+          hostPath:
+            path: /var/mnt/project/code/services/kong
+            type: Directory
+        - name: kong-config
+          hostPath:
+            path: /var/mnt/project/config/kong
+            type: Directory

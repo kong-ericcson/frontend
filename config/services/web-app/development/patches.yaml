@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+spec:
+  template:
+    spec:
+      containers:
+        - name: app
+          env:
+            - name: API_URL
+              value: "http://api.{{NS:main}}.svc.cluster.local"
+          volumeMounts:
+            - name: project
+              mountPath: /app
+            - name: node-modules
+              mountPath: /app/node_modules
+            - name: clients
+              mountPath: /clients
+      volumes:
+        - name: project
+          hostPath:
+            path: /var/mnt/project/code/services/web-app
+            type: Directory
+        - name: node-modules
+          hostPath:
+            path: /var/mnt/workspace/.bluetext/cache/web-app/node_modules
+            type: DirectoryOrCreate
+        - name: clients
+          hostPath:
+            path: /var/mnt/project/code/clients
+            type: Directory
