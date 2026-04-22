@@ -1,0 +1,3 @@
+[submodule "code/services/web-app"]
+	path = code/services/web-app
+	url = https://github.com/kong-ericcson/sync-forward-magic.git
